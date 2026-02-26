@@ -1,0 +1,7 @@
+html,
+body {
+    height: 100%;
+    background-color: #f4f4fc;
+    flex-wrap: wrap;
+    font-family: 'Inter',sans-serif;
+}

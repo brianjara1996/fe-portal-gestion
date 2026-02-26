@@ -1,0 +1,23 @@
+.form-group span {
+    margin-top: 15px;
+}
+
+.processingUser {
+    min-width: 50px;
+    padding-top: 4px;
+}
+
+.errorMessage {
+    color: #E12D39;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0em;
+    line-height: 1rem;
+    font-weight: 400;
+    padding: 15px;
+}
+
+.strongClass {
+    font-weight: bold;
+    font-style: oblique;
+}
