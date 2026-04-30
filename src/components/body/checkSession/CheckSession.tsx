@@ -6,11 +6,20 @@ import { Navigate } from 'react-router-dom';
 const SESSION_PROCESSING = 0;
 const SESSION_INVALID = 1;
 
+
+function isLocalhostEnv() {
+    return typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+}
+
 const CheckSession = () => {
 
     const [validSession, setValidSession] = useState(SESSION_PROCESSING);
 
     useEffect(() => {
+        if (isLocalhostEnv()) {
+            return;
+        }
+
         const token = getToken();
         if (token != null) {            
             if (token.bearer !== null && token.createAt !== null && token.expirationTime !== null ) {

@@ -3,10 +3,16 @@ import {CardApp, Application, AllComponentsResponse } from "./../model/model";
 import { HttpClient } from "../libs/axios/HttpClient";
 import { AxiosHeaders } from "axios";
 
-
+function isLocalhostEnv() {
+    return typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+}
 
 async function getAllComponents(token): Promise<AllComponentsResponse> {
-    return new Promise((resolv, reject) => {
+    if (isLocalhostEnv()) {
+        return { apps: {}, domain: "NET01" };
+    }
+
+    return new Promise((resolv) => {
         let headers = new AxiosHeaders();        
 
         if (token !== null)
@@ -16,8 +22,8 @@ async function getAllComponents(token): Promise<AllComponentsResponse> {
             if (resp?.status == 200)
                 resolv(resp.response);
             else
-                reject({ apps: {} })
-        }).catch(() => reject({ apps: {} }));
+                resolv({ apps: {}, domain: "NET01" })
+        }).catch(() => resolv({ apps: {}, domain: "NET01" }));
 
     });
 }

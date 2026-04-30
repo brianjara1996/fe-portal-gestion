@@ -31,7 +31,7 @@ export async function postUser(token: string, userName: string, password: string
     return await HttpClient.post<ResponsePostUser, ErrorResponse>(ADM_PATH + '/user', null, headers, params);
 }
 
-export async function putUser(token: string, userName: string, password?: string, enable?: boolean, bankCode?: string, checkToAdd?: string[], checkToRemove?: string[]): Promise<ResponseCustom<any, ErrorResponse> | undefined> {
+export async function putUser(token: string, userName: string, password?: string, enable?: boolean, bankCode?: string, checkToAdd?: string[], checkToRemove?: string[], userPrincipalName?: string, cn?: string, name?: string): Promise<ResponseCustom<any, ErrorResponse> | undefined> {
     let headers = new AxiosHeaders();
     headers.set('Authorization', 'Bearer ' + token);
     let params = {
@@ -47,6 +47,12 @@ export async function putUser(token: string, userName: string, password?: string
         params['checkToAdd'] = checkToAdd
     if (checkToRemove != undefined && checkToRemove != null && checkToRemove.length > 0)
         params['checkToRemove'] = checkToRemove
+    if (userPrincipalName != undefined && userPrincipalName != null && userPrincipalName != '')
+        params['userPrincipalName'] = userPrincipalName
+    if (cn != undefined && cn != null && cn != '')
+        params['cn'] = cn
+    if (name != undefined && name != null && name != '')
+        params['name'] = name
 
     return await HttpClient.put<PostLoginResponse, ErrorResponse>(ADM_PATH + '/user', null, headers, params);
 }

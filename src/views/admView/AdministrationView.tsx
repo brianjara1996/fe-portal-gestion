@@ -261,11 +261,6 @@ const AdministrationView = () => {
                             <Table
                                 columns={[
                                     {
-                                        accessorKey: 'bankCode',
-                                        header: 'Banco',
-                                        id: 'bankCode'
-                                    },
-                                    {
                                         accessorKey: 'samAccountName',
                                         header: 'Usuario',
                                         id: 'samAccountName'

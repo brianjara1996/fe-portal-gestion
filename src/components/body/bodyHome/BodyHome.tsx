@@ -17,7 +17,9 @@ const BodyHome = (props: { isAdm: boolean }) => {
     const [token, setToken] = useState<Token>();
 
     function onUpdate() {
-        getApps(token.bearer).then(apps => setListApps(apps.applications));
+        if (token != null) {
+            getApps(token.bearer).then(apps => setListApps(apps.applications)).catch(() => setListApps(new Map<string, CardApp>()));
+        }
     }
 
     useEffect(() => {
@@ -40,12 +42,16 @@ const BodyHome = (props: { isAdm: boolean }) => {
 
     useEffect(() => {
         const token = getToken();
-        if (token != null)
+        if (token != null) {
+            setToken(token);
             getApps(token.bearer).then(apps => {
                 if ((props.isAdm != undefined && !props.isAdm) || apps.domain == "NET01" || apps.domain == "SSO") {
                     setListApps(apps.applications)
                 }
+            }).catch(() => {
+                setListApps(new Map<string, CardApp>());
             });
+        }
 
     }, [props.isAdm]);
 

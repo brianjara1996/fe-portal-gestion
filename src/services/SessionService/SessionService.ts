@@ -5,6 +5,10 @@ export const USERNAME_KEY = 'username';
 export const FAVORITE_APP_KEY = 'favorites_app';
 export const LOGIN_BY_SSO = 'login_by_sso'
 
+function isLocalhostEnv() {
+    return typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+}
+
 export function setSession(token: Token, username: string) {
     sessionStorage.setItem(TOKEN_KEY, JSON.stringify(token));
     sessionStorage.setItem(USERNAME_KEY, username);
@@ -36,6 +40,12 @@ export function getToken(): Token | null {
 }
 
 export function getIfIsAdm(isAdmCallBack: Function = () => { }, isRootCallBack: Function = () => { }, isUserCallBack: Function = () => { }) {
+    if (isLocalhostEnv()) {
+        if (isUserCallBack != undefined)
+            isUserCallBack();
+        return;
+    }
+
     const token = getToken();
     if (token != null && token != undefined) {
         verifyToken(token.bearer).then((r) => {
