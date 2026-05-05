@@ -28,7 +28,8 @@ const EditUser = (config: EditUserConf) => {
     const [password, setPassword] = useState('');
     const [confirPassword, setConfirPassword] = useState('');
     const [showModalGroups, setShowModalGroups] = useState(false);
-    const [name, setName] = useState('');
+    const [givenName, setGivenName] = useState('');
+    const [sn, setSn] = useState('');
     const [email, setEmail] = useState('');
     const [document, setDocument] = useState('');
     const [checks, setChecks] = useState<Check[]>();
@@ -55,7 +56,8 @@ const EditUser = (config: EditUserConf) => {
             checks.push(new Check(m.name, true))
         })
         setChecks(checks)
-        setName(config.user.name || '')
+        setGivenName(config.user.givenName || '')
+        setSn(config.user.sn || '')
         setEmail(config.user.userPrincipalName || '')
         setDocument(config.user.cn || '')
     }, [])
@@ -82,7 +84,7 @@ const EditUser = (config: EditUserConf) => {
 
             const token = getToken();
             if (token != null) {
-                putUser(token.bearer, config.user.samAccountName, password, undefined, config.user.bankCode, checkToAdd, checkToRemove, email, document, name)
+                putUser(token.bearer, config.user.samAccountName, password, undefined, config.user.bankCode, checkToAdd, checkToRemove, email, document, givenName, sn)
                     .then((r) => {
                         if (r.status == 200) {
                             setPassword('')
@@ -120,9 +122,15 @@ const EditUser = (config: EditUserConf) => {
 
 
 
-        if (name == '') {
+        if (givenName == '') {
             setErrMessage(ErrorsUsers.GENERIC_ERROR)
             setErrorMessageTxt('El nombre es obligatorio.')
+            return false;
+        }
+
+        if (sn == '') {
+            setErrMessage(ErrorsUsers.GENERIC_ERROR)
+            setErrorMessageTxt('El apellido es obligatorio.')
             return false;
         }
 
@@ -219,8 +227,18 @@ const EditUser = (config: EditUserConf) => {
                             fullWidth={true}
                             label="Nombre"
                             placeholder=""
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            value={givenName}
+                            onChange={(e) => setGivenName(e.target.value)}
+                            maxLength={100}
+                        />
+                    </div>
+                    <div className="form-group col-md-3">
+                        <TextInput
+                            fullWidth={true}
+                            label="Apellido"
+                            placeholder=""
+                            value={sn}
+                            onChange={(e) => setSn(e.target.value)}
                             maxLength={100}
                         />
                     </div>
