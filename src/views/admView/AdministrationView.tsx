@@ -152,7 +152,7 @@ const AdministrationView = () => {
         try {
             const token = getToken();
             if (token != null) {
-                putUser(token.bearer, userToDelete.samAccountName, null, false, userToDelete.bankCode).then((r) => {
+                putUser(token.bearer, userToDelete.samAccountName, null, false, userToDelete.bankCode, undefined, undefined, userToDelete.userPrincipalName, userToDelete.cn, userToDelete.givenName, userToDelete.sn).then((r) => {
                     if (r.status == 200) {
                         notification("Usuario eliminado", '', "info");
                     } else {
@@ -266,9 +266,14 @@ const AdministrationView = () => {
                                         id: 'samAccountName'
                                     },
                                     {
-                                        accessorKey: 'name',
+                                        accessorKey: 'givenName',
                                         header: 'Nombre',
-                                        id: 'name'
+                                        id: 'givenName'
+                                    },
+                                    {
+                                        accessorKey: 'sn',
+                                        header: 'Apellido',
+                                        id: 'sn'
                                     },
                                     {
                                         cell: (props) => {

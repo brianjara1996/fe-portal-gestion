@@ -17,7 +17,7 @@ export interface ResponsePostUser {
     error: ErrorResponse;
 }
 
-export async function postUser(token: string, userName: string, password: string, bankCode?: string, groups?: string[]): Promise<ResponseCustom<ResponsePostUser, ErrorResponse> | undefined> {
+export async function postUser(token: string, userName: string, password: string, bankCode?: string, groups?: string[], givenName?: string, sn?: string): Promise<ResponseCustom<ResponsePostUser, ErrorResponse> | undefined> {
     let headers = new AxiosHeaders();
     headers.set('Authorization', 'Bearer ' + token);
     let params = {
@@ -51,10 +51,6 @@ export async function putUser(token: string, userName: string, password?: string
         params['email'] = email
     if (dni != undefined && dni != null && dni != '')
         params['dni'] = dni
-    if (givenName != undefined && givenName != null && givenName != '')
-        params['givenName'] = givenName
-    if (sn != undefined && sn != null && sn != '')
-        params['sn'] = sn
 
     return await HttpClient.put<PostLoginResponse, ErrorResponse>(ADM_PATH + '/user', null, headers, params);
 }

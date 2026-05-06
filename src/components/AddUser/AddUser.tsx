@@ -30,6 +30,8 @@ const AddUser = (config: AddUserConf) => {
     const [bankCode, setBankCode] = useState(config.user != undefined ? config.user.bankCode : '');
     const [userName, setUserName] = useState(config.user != undefined ? config.user.samAccountName : '');
     const [password, setPassword] = useState('');
+    const [givenName, setGivenName] = useState('');
+    const [sn, setSn] = useState('');
     const [confirPassword, setConfirPassword] = useState('');
     const [showModalGroups, setShowModalGroups] = useState(false);
     const [checks, setChecks] = useState<Check[]>();
@@ -38,6 +40,8 @@ const AddUser = (config: AddUserConf) => {
     const [inProcess, setInProcess] = useState(false);
 
     const [invalidUser, setInvalidUser] = useState(false);
+    const [invalidGivenName, setInvalidGivenName] = useState(false);
+    const [invalidSn, setInvalidSn] = useState(false);
     const [invalidPass, setInvalidPass] = useState(false);
     const [invalidPassText, setInvalidPassText] = useState('');
     const [btnPermisoError, setBtnPermisoError] = useState(false);
@@ -88,7 +92,7 @@ const AddUser = (config: AddUserConf) => {
                 console.log(bankCode + "." + userName)
 
                 const localBankCode = (bankCode == '' || bankCode == undefined) ? config.bankCode : bankCode
-                postUser(token.bearer, localBankCode  + "." + userName, password, localBankCode, checksStr)
+                postUser(token.bearer, localBankCode  + "." + userName, password, localBankCode, checksStr, givenName, sn)
                     .then((r) => {
                         if (r.status == 201) {
                             if (r.response.groupsFiled != undefined && r.response.groupsFiled.length > 0) {
@@ -97,6 +101,8 @@ const AddUser = (config: AddUserConf) => {
                             }
                             setUserName('')
                             setPassword('')
+                            setGivenName('')
+                            setSn('')
                             setConfirPassword('')
                             config.onSuccess()
                         } else if (r.status == 400) {
@@ -126,6 +132,8 @@ const AddUser = (config: AddUserConf) => {
     function checkCreateUser(ouLst) {
         
         setInvalidUser(false)
+        setInvalidGivenName(false)
+        setInvalidSn(false)
         setInvalidPass(false)
         setBtnPermisoError(false)
         setInvalidBankCode(false)
@@ -138,6 +146,14 @@ const AddUser = (config: AddUserConf) => {
         }
         if (userName == '') {
             setInvalidUser(true)
+            return false;
+        }
+        if (givenName == '') {
+            setInvalidGivenName(true)
+            return false;
+        }
+        if (sn == '') {
+            setInvalidSn(true)
             return false;
         }
         if (password.length < 8 || password == '') {
@@ -199,6 +215,32 @@ const AddUser = (config: AddUserConf) => {
                         />
                     </div>
 
+                    <div className="form-group col-md-2">
+                        <TextInput
+                            fullWidth={true}
+                            label="Nombre"
+                            placeholder=""
+                            value={givenName}
+                            onChange={(e) => setGivenName(e.target.value)}
+                            maxLength={100}
+                            invalid={invalidGivenName}
+                            errorText={"Nombre inválido."}
+
+                        />
+                    </div>
+                    <div className="form-group col-md-2">
+                        <TextInput
+                            fullWidth={true}
+                            label="Apellido"
+                            placeholder=""
+                            value={sn}
+                            onChange={(e) => setSn(e.target.value)}
+                            maxLength={100}
+                            invalid={invalidSn}
+                            errorText={"Apellido inválido."}
+
+                        />
+                    </div>
                     <div className="form-group col-md-2">
                         <TextInput
                             fullWidth={true}
