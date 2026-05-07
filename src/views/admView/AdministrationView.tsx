@@ -122,6 +122,19 @@ const AdministrationView = () => {
         setShowModalDelete(true);
     }
 
+    function paginateUsers(usersLst: UserDto[], pageIndex: number, pageSize: number) {
+        if (usersLst == undefined)
+            return [];
+        let usersFilter = []
+        const indexStart = pageSize * (pageIndex | 0)
+        for (let i = indexStart; i < indexStart + pageSize; i++) {
+            if (i >= usersLst.length)
+                break;
+            usersFilter.push(usersLst[i]);
+        }
+        return usersFilter;
+    }
+
     function loadListUser() {
         getUsers(token.bearer).then(r => {
             if (r.status == 200) {
@@ -133,6 +146,8 @@ const AdministrationView = () => {
                 setUsers(userLst);
 
                 userPagination({ pageIndex: pageUIndex, pageSize: pageUSize }, userLst)
+                const localPageIndex = pageUIndex == undefined ? 0 : (pageUIndex | 0);
+                setUsersFiltered(paginateUsers(userLst, localPageIndex, pageUSize));
                 setLoadUserTable(true);
                 let ous = [];
                 r.response.ous.forEach(ou => {
@@ -206,7 +221,7 @@ const AdministrationView = () => {
             setPageUCount(Math.ceil(userToFilter.length / pagination.pageSize))
         }
 
-        if (userToFilter != undefined) {
+        if (userToFilter != undefined && (dataDiff || reloadByChange || pageUIndex == undefined || pagination.pageIndex != pageUIndex)) {
 
             let usersFilter = []
             setPageUIndex(pagination.pageIndex | 0)
