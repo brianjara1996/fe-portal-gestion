@@ -206,7 +206,7 @@ const AdministrationView = () => {
             setPageUCount(Math.ceil(userToFilter.length / pagination.pageSize))
         }
 
-        if (userToFilter != undefined && (dataDiff || reloadByChange || pageUIndex == undefined || pagination.pageIndex != pageUIndex)) {
+        if (userToFilter != undefined) {
 
             let usersFilter = []
             setPageUIndex(pagination.pageIndex | 0)
