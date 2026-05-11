@@ -21,12 +21,17 @@ export enum ErrorsUsers {
 }
 
 export const regexPassword = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,25}$/;
+const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const EditUser = (config: EditUserConf) => {
 
     const [password, setPassword] = useState('');
     const [confirPassword, setConfirPassword] = useState('');
     const [showModalGroups, setShowModalGroups] = useState(false);
+    const [givenName, setGivenName] = useState('');
+    const [sn, setSn] = useState('');
+    const [email, setEmail] = useState('');
+    const [document, setDocument] = useState('');
     const [checks, setChecks] = useState<Check[]>();
     const [checksStr, setChecksStr] = useState<string[]>();
 
@@ -34,6 +39,8 @@ const EditUser = (config: EditUserConf) => {
 
     const [invalidPass, setInvalidPass] = useState(false);
     const [invalidPassText, setInvalidPassText] = useState('');
+    const [invalidEmail, setInvalidEmail] = useState(false);
+    const [invalidEmailText, setInvalidEmailText] = useState('');
     const [btnPermisoError, setBtnPermisoError] = useState(false);
 
     const [errorMessage, setErrorMessage] = useState(false);
@@ -44,12 +51,30 @@ const EditUser = (config: EditUserConf) => {
 
 
     useEffect(() => {
+        if (config.user == undefined) {
+            return;
+        }
+
         let checks = []
         config.user.memberOf.forEach(m => {
             checks.push(new Check(m.name, true))
         })
         setChecks(checks)
-    }, [])
+        setChecksStr(undefined)
+        setCheckToAdd(undefined)
+        setCheckToRemove(undefined)
+
+        setGivenName(config.user.givenName || '')
+        setSn(config.user.sn || '')
+        setEmail(config.user.userPrincipalName || '')
+        setDocument(config.user.dni || config.user.cn || '')
+        setPassword('')
+        setConfirPassword('')
+        setInvalidPass(false)
+        setInvalidEmail(false)
+        setErrorMessage(false)
+        setErrorMessageTxt(undefined)
+    }, [config.user])
 
     function close() {
         setChecks(undefined);
@@ -73,7 +98,7 @@ const EditUser = (config: EditUserConf) => {
 
             const token = getToken();
             if (token != null) {
-                putUser(token.bearer, config.user.samAccountName, password, undefined, config.user.bankCode, checkToAdd, checkToRemove)
+                putUser(token.bearer, config.user.samAccountName, password, undefined, config.user.bankCode, checkToAdd, checkToRemove, email, document, givenName, sn)
                     .then((r) => {
                         if (r.status == 200) {
                             setPassword('')
@@ -106,6 +131,40 @@ const EditUser = (config: EditUserConf) => {
         setBtnPermisoError(false)
         setErrorMessage(false)
         setErrorMessageTxt(undefined)
+        setInvalidEmail(false)
+        setInvalidEmailText('')
+
+
+
+        if (givenName == '') {
+            setErrMessage(ErrorsUsers.GENERIC_ERROR)
+            setErrorMessageTxt('El nombre es obligatorio.')
+            return false;
+        }
+
+        if (sn == '') {
+            setErrMessage(ErrorsUsers.GENERIC_ERROR)
+            setErrorMessageTxt('El apellido es obligatorio.')
+            return false;
+        }
+
+        if (email == '') {
+            setInvalidEmail(true)
+            setInvalidEmailText('El correo es obligatorio.')
+            return false;
+        }
+
+        if (!regexEmail.test(email)) {
+            setInvalidEmail(true)
+            setInvalidEmailText('Debe ingresar un correo electrónico válido.')
+            return false;
+        }
+
+        if (document == '') {
+            setErrMessage(ErrorsUsers.GENERIC_ERROR, 'Documento inválido')
+            setErrorMessageTxt('El documento es obligatorio.')
+            return false;
+        }
 
         if (password != '' || confirPassword != '') {
             if (password.length < 8) {
@@ -175,6 +234,48 @@ const EditUser = (config: EditUserConf) => {
                             autoComplete='new-password'
                             invalid={invalidPass}
                             maxLength={25}
+                        />
+                    </div>
+                    <div className="form-group col-md-3">
+                        <TextInput
+                            fullWidth={true}
+                            label="Nombre"
+                            placeholder=""
+                            value={givenName}
+                            onChange={(e) => setGivenName(e.target.value)}
+                            maxLength={100}
+                        />
+                    </div>
+                    <div className="form-group col-md-3">
+                        <TextInput
+                            fullWidth={true}
+                            label="Apellido"
+                            placeholder=""
+                            value={sn}
+                            onChange={(e) => setSn(e.target.value)}
+                            maxLength={100}
+                        />
+                    </div>
+                    <div className="form-group col-md-3">
+                        <TextInput
+                            fullWidth={true}
+                            label="Correo"
+                            placeholder=""
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            invalid={invalidEmail}
+                            errorText={invalidEmailText}
+                            maxLength={255}
+                        />
+                    </div>
+                    <div className="form-group col-md-2">
+                        <TextInput
+                            fullWidth={true}
+                            label="Documento"
+                            placeholder=""
+                            value={document}
+                            onChange={(e) => setDocument(e.target.value)}
+                            maxLength={30}
                         />
                     </div>
                     <div className="form-group col-md-1">

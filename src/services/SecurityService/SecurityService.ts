@@ -6,11 +6,25 @@ import { ResponseCustom } from "../libs/axios/model/model";
 import { SECURITY_URL } from "../../config/DefaultValues";
 import { getAccessToken } from "../SessionService/SessionService";
 
+function isLocalhostEnv() {
+    return typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+}
+
 export function auth(user: string, password: string, domain: ESessionType): Promise<ResponseCustom<PostLoginResponse, ErrorResponse> | undefined> {
     return login(user, password, domain);
 }
 
 async function login(user: string, password: string, sessionType: ESessionType): Promise<ResponseCustom<PostLoginResponse, ErrorResponse> | undefined> {
+    if (isLocalhostEnv()) {
+        return new ResponseCustom<PostLoginResponse, ErrorResponse>(201, {
+            applicationToken: {
+                bearer: 'local-dev-token',
+                createAt: Math.round(Date.now() / 1000),
+                expirationTime: 60 * 60 * 24
+            }
+        } as PostLoginResponse, null);
+    }
+
     let headers = new AxiosHeaders();
     headers.set('Authorization', 'Basic ' + Buffer.from(user + ':' + password).toString('base64'));
     headers.set('Domain', sessionType);
@@ -24,6 +38,22 @@ export enum ESessionType {
   }
 
 export async function verifyToken(token: string): Promise<ResponseCustom<GetLoginResponse, ErrorResponse> | undefined> {
+    if (isLocalhostEnv()) {
+        return new ResponseCustom<GetLoginResponse, ErrorResponse>(200, {
+            valid: true,
+            content: {
+                maxUserLvl: 'USER',
+                bankCode: '',
+                memberOf: [],
+                memberOfBanks: [],
+                aplications: [],
+                userOu: '',
+                name: 'Local User',
+                username: 'local.user'
+            }
+        } as GetLoginResponse, null);
+    }
+
     let headers = new AxiosHeaders();
     headers.set('Authorization', 'Bearer ' + token);
     return await HttpClient.get<GetLoginResponse, ErrorResponse>(SECURITY_URL + '/auth', headers);

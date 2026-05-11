@@ -122,6 +122,19 @@ const AdministrationView = () => {
         setShowModalDelete(true);
     }
 
+    function paginateUsers(usersLst: UserDto[], pageIndex: number, pageSize: number) {
+        if (usersLst == undefined)
+            return [];
+        let usersFilter = []
+        const indexStart = pageSize * (pageIndex | 0)
+        for (let i = indexStart; i < indexStart + pageSize; i++) {
+            if (i >= usersLst.length)
+                break;
+            usersFilter.push(usersLst[i]);
+        }
+        return usersFilter;
+    }
+
     function loadListUser() {
         getUsers(token.bearer).then(r => {
             if (r.status == 200) {
@@ -133,6 +146,8 @@ const AdministrationView = () => {
                 setUsers(userLst);
 
                 userPagination({ pageIndex: pageUIndex, pageSize: pageUSize }, userLst)
+                const localPageIndex = pageUIndex == undefined ? 0 : (pageUIndex | 0);
+                setUsersFiltered(paginateUsers(userLst, localPageIndex, pageUSize));
                 setLoadUserTable(true);
                 let ous = [];
                 r.response.ous.forEach(ou => {
@@ -152,7 +167,7 @@ const AdministrationView = () => {
         try {
             const token = getToken();
             if (token != null) {
-                putUser(token.bearer, userToDelete.samAccountName, null, false, userToDelete.bankCode).then((r) => {
+                putUser(token.bearer, userToDelete.samAccountName, null, false, userToDelete.bankCode, undefined, undefined, userToDelete.userPrincipalName, userToDelete.dni || userToDelete.cn, userToDelete.givenName, userToDelete.sn).then((r) => {
                     if (r.status == 200) {
                         notification("Usuario eliminado", '', "info");
                     } else {
@@ -261,19 +276,24 @@ const AdministrationView = () => {
                             <Table
                                 columns={[
                                     {
-                                        accessorKey: 'bankCode',
-                                        header: 'Banco',
-                                        id: 'bankCode'
-                                    },
-                                    {
                                         accessorKey: 'samAccountName',
                                         header: 'Usuario',
                                         id: 'samAccountName'
                                     },
                                     {
-                                        accessorKey: 'name',
+                                        accessorKey: 'givenName',
                                         header: 'Nombre',
-                                        id: 'name'
+                                        id: 'givenName'
+                                    },
+                                    {
+                                        accessorKey: 'sn',
+                                        header: 'Apellido',
+                                        id: 'sn'
+                                    },
+                                    {
+                                        accessorKey: 'dni',
+                                        header: 'Documento',
+                                        id: 'dni'
                                     },
                                     {
                                         cell: (props) => {

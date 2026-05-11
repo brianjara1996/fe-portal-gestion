@@ -4,6 +4,7 @@ import logo from "./../assets/logo-prisma.svg";
 import React, { useEffect, useState } from 'react';
 import { ESessionType, auth } from '../../../services/SecurityService/SecurityService';
 import { setSession, unSetSession, getToken, existSessionMsal } from '../../../services/SessionService/SessionService';
+import { Token } from '../../../services/model/model';
 import { Navigate } from 'react-router-dom';
 import { Button, PasswordInput, TextInput } from '@orbita-ui/core';
 import LoginDto from '../../../model/LoginDto';
@@ -14,6 +15,10 @@ const ERROR_SESSION_EXPIRED = "Sesión finalizada."
 const SESSION_PROCESSING = 0;
 const SESSION_VALID = 1;
 
+
+function isLocalhostEnv() {
+    return typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+}
 
 const BodyLogin = (config: LoginDto) => {
 
@@ -28,6 +33,19 @@ const BodyLogin = (config: LoginDto) => {
     function login(event: any) {
         event.preventDefault();
         setInLogin(true);
+
+        // Bypass temporal para pruebas locales sin backend de seguridad.
+        if (isLocalhostEnv()) {
+            const localToken: Token = {
+                bearer: 'local-dev-token',
+                createAt: Math.round(Date.now() / 1000),
+                expirationTime: 60 * 60 * 24
+            };
+            setSession(localToken, user || 'local.user');
+            setTimeout(() => { setValidSession(SESSION_VALID) }, 200);
+            return;
+        }
+
         auth(user, password, config.domain).then(r => {
             if (r?.status === 201) {
                 setSession(r.response.applicationToken, user);
