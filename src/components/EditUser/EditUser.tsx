@@ -59,7 +59,7 @@ const EditUser = (config: EditUserConf) => {
         setGivenName(config.user.givenName || '')
         setSn(config.user.sn || '')
         setEmail(config.user.userPrincipalName || '')
-        setDocument(config.user.cn || '')
+        setDocument(config.user.dni || config.user.cn || '')
     }, [])
 
     function close() {

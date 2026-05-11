@@ -97,6 +97,7 @@ export class User {
     name!: string;
     samAccountName!: string;
     userPrincipalName!: string;
+    dni!: string;
     displayName!: string;
     givenName!: string;
     sn!: string;
@@ -110,6 +111,7 @@ export class UserDto {
     name!: string;
     samAccountName!: string;
     userPrincipalName!: string;
+    dni!: string;
     displayName!: string;
     givenName!: string;
     sn!: string;
