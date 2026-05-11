@@ -51,16 +51,30 @@ const EditUser = (config: EditUserConf) => {
 
 
     useEffect(() => {
+        if (config.user == undefined) {
+            return;
+        }
+
         let checks = []
         config.user.memberOf.forEach(m => {
             checks.push(new Check(m.name, true))
         })
         setChecks(checks)
+        setChecksStr(undefined)
+        setCheckToAdd(undefined)
+        setCheckToRemove(undefined)
+
         setGivenName(config.user.givenName || '')
         setSn(config.user.sn || '')
         setEmail(config.user.userPrincipalName || '')
         setDocument(config.user.dni || config.user.cn || '')
-    }, [])
+        setPassword('')
+        setConfirPassword('')
+        setInvalidPass(false)
+        setInvalidEmail(false)
+        setErrorMessage(false)
+        setErrorMessageTxt(undefined)
+    }, [config.user])
 
     function close() {
         setChecks(undefined);
